@@ -45,3 +45,6 @@ next-env.d.ts
 .claude/
 .cursor/
 .devin/
+
+# Project documentation
+docs/
