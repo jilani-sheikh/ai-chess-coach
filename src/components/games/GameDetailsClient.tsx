@@ -10,6 +10,7 @@ import { EvaluationBar } from "@/components/games/EvaluationBar";
 import { EvaluationGraph } from "@/components/games/EvaluationGraph";
 import { MoveAnalysisCard } from "@/components/games/MoveAnalysisCard";
 import { AnalysisOverviewCard } from "@/components/games/AnalysisOverviewCard";
+import { AICoachChat } from "@/components/games/AICoachChat";
 import {
   ArrowLeft,
   Download,
@@ -305,16 +306,16 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
         </div>
       </div>
 
-      {/* Main Content Area (2 Columns) */}
+      {/* Main Content Area: Desktop (Board | AI Coach), Mobile (Board, AI Coach, Graph, Analysis) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Left Column: Interactive Chessboard, Eval Bar, Playback & Graph (7 cols) */}
-        <div className="lg:col-span-7 space-y-5">
-          <div className="glass-card rounded-3xl p-4 sm:p-6 border border-[rgba(223,180,108,0.22)] shadow-2xl space-y-6">
+        {/* Left Column: Interactive Chessboard, Eval Bar & Playback Controls */}
+        <div className="order-1 lg:col-span-7 space-y-5">
+          <div className="glass-card rounded-3xl p-4 sm:p-5 border border-[rgba(223,180,108,0.22)] shadow-2xl space-y-4">
             {/* Board Container with Side-by-Side Eval Bar */}
-            <div className="flex items-center justify-center gap-3 sm:gap-4 max-w-[620px] mx-auto">
+            <div className="flex items-center justify-center gap-3 sm:gap-4 max-w-[480px] mx-auto">
               {/* Vertical Evaluation Bar (visible when analysis completed or active) */}
               {game.analysis?.status === "COMPLETED" && (
-                <div className="h-[280px] sm:h-[480px]">
+                <div className="h-[280px] sm:h-[420px]">
                   <EvaluationBar
                     score={activeScore}
                     mate={activeMate}
@@ -338,7 +339,7 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
             </div>
 
             {/* Playback & Controls Bar */}
-            <div className="space-y-4 pt-2 border-t border-zinc-800/80">
+            <div className="space-y-3 pt-2 border-t border-zinc-800/80">
               {/* Button Bar */}
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-1.5 flex-wrap">
@@ -441,9 +442,26 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Interactive Evaluation Graph (White Perspective) */}
-          {game.analysis?.status === "COMPLETED" && (
+        {/* Right Column (Row 1): AI Coach Chat Panel */}
+        <div className="order-2 lg:col-span-5">
+          <AICoachChat
+            gameId={game.id}
+            white={game.white}
+            black={game.black}
+            result={game.result}
+            event={game.event}
+            userColor={game.userColor}
+            currentMoveIndex={currentMoveIndex}
+            currentFen={currentFen}
+            currentMoveAnalysis={currentMoveAnalysis}
+          />
+        </div>
+
+        {/* Left Column (Row 2): Interactive Evaluation Graph (White Perspective) */}
+        {game.analysis?.status === "COMPLETED" && (
+          <div className="order-3 lg:col-span-7">
             <EvaluationGraph
               moves={analysisMoves}
               currentMoveIndex={currentMoveIndex}
@@ -452,11 +470,11 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
                 setCurrentMoveIndex(idx);
               }}
             />
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Right Column: Move Matrix, Analysis Cards & Game Info (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
+        {/* Right Column (Row 2): Move Matrix, Analysis Cards & Game Info */}
+        <div className="order-4 lg:col-span-5 space-y-6">
           {/* Analysis Overview Card (Actions + Accuracy + Mistakes) */}
           <AnalysisOverviewCard
             gameId={game.id}
