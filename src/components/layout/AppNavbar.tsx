@@ -29,6 +29,8 @@ export function AppNavbar({ user }: AppNavbarProps) {
 
   const isDashboardActive = pathname === "/dashboard";
   const isGamesActive = pathname?.startsWith("/games");
+  const isProfileActive = pathname === "/profile";
+  const isTrainingActive = pathname === "/training";
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-[#0b0b0e]/90 border-b border-[rgba(223,180,108,0.18)] shadow-md">
@@ -63,7 +65,7 @@ export function AppNavbar({ user }: AppNavbarProps) {
         </Link>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+        <nav className="hidden md:flex items-center gap-7 text-sm font-medium">
           <Link
             href="/dashboard"
             className={`transition-colors relative py-1 ${
@@ -90,18 +92,35 @@ export function AppNavbar({ user }: AppNavbarProps) {
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#dfb46c] to-transparent" />
             )}
           </Link>
-          <span
-            className="text-zinc-600 cursor-not-allowed text-xs px-2 py-0.5 rounded border border-zinc-800"
-            title="Training coming in Phase 3"
+          <Link
+            href="/profile"
+            className={`transition-colors relative py-1 ${
+              isProfileActive
+                ? "text-[#dfb46c] font-semibold"
+                : "text-zinc-400 hover:text-zinc-200"
+            }`}
           >
-            Training (Soon)
-          </span>
-          <span
-            className="text-zinc-600 cursor-not-allowed text-xs px-2 py-0.5 rounded border border-zinc-800"
-            title="Pricing coming soon"
+            Profile
+            {isProfileActive && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#dfb46c] to-transparent" />
+            )}
+          </Link>
+          <Link
+            href="/training"
+            className={`transition-colors relative py-1 flex items-center gap-1.5 ${
+              isTrainingActive
+                ? "text-[#dfb46c] font-semibold"
+                : "text-zinc-400 hover:text-zinc-200"
+            }`}
           >
-            Pricing
-          </span>
+            Training
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-[#dfb46c]/80 border border-zinc-700/80 font-normal">
+              Soon
+            </span>
+            {isTrainingActive && (
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#dfb46c] to-transparent" />
+            )}
+          </Link>
         </nav>
 
         {/* Actions & Profile */}
@@ -117,21 +136,27 @@ export function AppNavbar({ user }: AppNavbarProps) {
 
           {/* User Profile Badge */}
           <div className="flex items-center gap-3 pl-2 border-l border-zinc-800">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#dfb46c]/40 to-[#9e7428]/40 border border-[#dfb46c]/50 flex items-center justify-center text-xs font-bold text-[#f4d084] shadow-sm">
-              {user?.image ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={user.image}
-                  alt={displayName}
-                  className="w-full h-full rounded-full object-cover"
-                />
-              ) : (
-                initials || <UserIcon className="w-4 h-4" />
-              )}
-            </div>
-            <span className="text-sm font-medium text-zinc-200">
-              {displayName}
-            </span>
+            <Link
+              href="/profile"
+              title="View Profile"
+              className="flex items-center gap-2.5 group/user cursor-pointer"
+            >
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#dfb46c]/40 to-[#9e7428]/40 border border-[#dfb46c]/50 flex items-center justify-center text-xs font-bold text-[#f4d084] shadow-sm group-hover/user:border-[#dfb46c] transition-colors">
+                {user?.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={user.image}
+                    alt={displayName}
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  initials || <UserIcon className="w-4 h-4" />
+                )}
+              </div>
+              <span className="text-sm font-medium text-zinc-200 group-hover/user:text-white transition-colors">
+                {displayName}
+              </span>
+            </Link>
 
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
@@ -156,7 +181,11 @@ export function AppNavbar({ user }: AppNavbarProps) {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden bg-[#13131a] border-b border-[rgba(223,180,108,0.2)] px-6 py-6 space-y-4 animate-in slide-in-from-top-2">
-          <div className="flex items-center gap-3 pb-4 border-b border-zinc-800">
+          <Link
+            href="/profile"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center gap-3 pb-4 border-b border-zinc-800 hover:opacity-90"
+          >
             <div className="w-10 h-10 rounded-full bg-[#dfb46c]/20 border border-[#dfb46c]/40 flex items-center justify-center font-bold text-[#f4d084]">
               {initials}
             </div>
@@ -164,7 +193,7 @@ export function AppNavbar({ user }: AppNavbarProps) {
               <p className="text-sm font-medium text-white">{displayName}</p>
               <p className="text-xs text-zinc-400">{user?.email}</p>
             </div>
-          </div>
+          </Link>
           <nav className="flex flex-col gap-3 text-base font-medium">
             <Link
               href="/dashboard"
@@ -183,6 +212,27 @@ export function AppNavbar({ user }: AppNavbarProps) {
               }`}
             >
               Games
+            </Link>
+            <Link
+              href="/profile"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`py-2 px-3 rounded-lg ${
+                isProfileActive ? "bg-[#dfb46c]/15 text-[#dfb46c]" : "text-zinc-300 hover:bg-zinc-800"
+              }`}
+            >
+              Profile
+            </Link>
+            <Link
+              href="/training"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`py-2 px-3 rounded-lg flex items-center justify-between ${
+                isTrainingActive ? "bg-[#dfb46c]/15 text-[#dfb46c]" : "text-zinc-300 hover:bg-zinc-800"
+              }`}
+            >
+              <span>Training</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-[#dfb46c] border border-zinc-700 font-normal">
+                Soon
+              </span>
             </Link>
           </nav>
           <div className="pt-4 border-t border-zinc-800">
