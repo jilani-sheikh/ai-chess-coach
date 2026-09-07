@@ -15,8 +15,10 @@ model User {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  games         Game[]
+  accounts          Account[]
+  games             Game[]
+  trainingSessions  TrainingSession[]
+  trainingAttempts  TrainingAttempt[]
 }
 
 model Game {
@@ -35,8 +37,9 @@ model Game {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
 
-  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  analysis GameAnalysis?
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  analysis         GameAnalysis?
+  trainingAttempts TrainingAttempt[]
 
   @@index([userId])
   @@index([playedAt])
@@ -116,4 +119,50 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+}
+
+// ---- Phase 6: Personalized Training ----
+
+model TrainingSession {
+  id               String            @id @default(cuid())
+  userId           String
+  category         String            // "Tactical Awareness" | "Blunder Prevention" | "Endgame Decisions" | "Opening Decisions" | "Mixed"
+  totalPuzzles     Int               @default(5)
+  completedPuzzles Int               @default(0)
+  solvedCount      Int               @default(0) // CORRECT + ACCEPTABLE
+  status           String            @default("ACTIVE") // "ACTIVE" | "COMPLETED"
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  user     User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  attempts TrainingAttempt[]
+
+  @@index([userId])
+  @@index([userId, status])
+}
+
+model TrainingAttempt {
+  id             String   @id @default(cuid())
+  sessionId      String
+  userId         String
+  gameId         String
+  moveAnalysisId String   // References MoveAnalysis.id for traceability
+  setupFen       String   @db.Text   // The FEN before the mistake
+  userMove       String   // SAN of the user's attempted move
+  bestMove       String   // Engine's best move in SAN format
+  bestMoveUci    String   // Engine's best move in UCI format
+  result         String   // "CORRECT" | "ACCEPTABLE" | "INCORRECT"
+  cplAfter       Int      @default(0) // Average CPL across all steps
+  category       String   // Puzzle category
+  stepsCompleted Int      @default(1) // User decision steps completed
+  stepsTotal     Int      @default(1) // Total user decision steps in puzzle
+  createdAt      DateTime @default(now())
+
+  session TrainingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game    Game            @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([userId])
+  @@index([userId, category])
 }

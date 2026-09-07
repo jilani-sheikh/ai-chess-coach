@@ -107,16 +107,13 @@ export function AppNavbar({ user }: AppNavbarProps) {
           </Link>
           <Link
             href="/training"
-            className={`transition-colors relative py-1 flex items-center gap-1.5 ${
+            className={`transition-colors relative py-1 ${
               isTrainingActive
                 ? "text-[#dfb46c] font-semibold"
                 : "text-zinc-400 hover:text-zinc-200"
             }`}
           >
             Training
-            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-[#dfb46c]/80 border border-zinc-700/80 font-normal">
-              Soon
-            </span>
             {isTrainingActive && (
               <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#dfb46c] to-transparent" />
             )}
@@ -225,14 +222,11 @@ export function AppNavbar({ user }: AppNavbarProps) {
             <Link
               href="/training"
               onClick={() => setMobileMenuOpen(false)}
-              className={`py-2 px-3 rounded-lg flex items-center justify-between ${
+              className={`py-2 px-3 rounded-lg ${
                 isTrainingActive ? "bg-[#dfb46c]/15 text-[#dfb46c]" : "text-zinc-300 hover:bg-zinc-800"
               }`}
             >
-              <span>Training</span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-[#dfb46c] border border-zinc-700 font-normal">
-                Soon
-              </span>
+              Training
             </Link>
           </nav>
           <div className="pt-4 border-t border-zinc-800">
