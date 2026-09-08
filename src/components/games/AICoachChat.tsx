@@ -315,13 +315,17 @@ export function AICoachChat({
             )}
 
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 text-xs leading-relaxed ${
+              className={`max-w-[88%] sm:max-w-[85%] rounded-2xl px-3.5 sm:px-4 py-2.5 sm:py-3 text-xs leading-relaxed break-words overflow-hidden ${
                 msg.role === "user"
                   ? "bg-zinc-900 text-zinc-100 border border-[#dfb46c]/30 shadow-md"
-                  : "bg-zinc-900/70 text-zinc-200 border border-zinc-800/90 shadow-sm whitespace-pre-wrap"
+                  : "bg-zinc-900/70 text-zinc-200 border border-zinc-800/90 shadow-sm"
               }`}
             >
-              {msg.text}
+              {msg.role === "user" ? (
+                msg.text
+              ) : (
+                <FormattedChatMessage text={msg.text} />
+              )}
             </div>
 
             {msg.role === "user" && (
@@ -417,4 +421,74 @@ export function AICoachChat({
       </div>
     </div>
   );
+}
+
+function FormattedChatMessage({ text }: { text: string }) {
+  const blocks = text.split("\n\n").filter((b) => b.trim().length > 0);
+
+  return (
+    <div className="space-y-2.5 text-xs text-zinc-200 leading-relaxed">
+      {blocks.map((block, bIdx) => {
+        const trimmed = block.trim();
+
+        if (trimmed.startsWith("#")) {
+          const headingText = trimmed.replace(/^#+\s*/, "");
+          return (
+            <h4
+              key={bIdx}
+              className="font-serif text-xs font-bold text-[#f4d084] pt-1 border-b border-zinc-800/80 pb-0.5"
+            >
+              {renderInlineFormatted(headingText)}
+            </h4>
+          );
+        }
+
+        const lines = trimmed.split("\n");
+        const isList = lines.some(
+          (line) => line.trim().startsWith("- ") || line.trim().startsWith("* ")
+        );
+
+        if (isList) {
+          return (
+            <ul key={bIdx} className="space-y-1 pl-2 text-zinc-300">
+              {lines.map((line, lIdx) => {
+                const itemTrimmed = line.trim();
+                const isBullet =
+                  itemTrimmed.startsWith("- ") || itemTrimmed.startsWith("* ");
+                const content = isBullet
+                  ? itemTrimmed.replace(/^[-*]\s*/, "")
+                  : itemTrimmed;
+                return (
+                  <li key={lIdx} className="flex items-start gap-1.5 leading-snug">
+                    {isBullet && <span className="text-[#dfb46c] font-bold">•</span>}
+                    <span>{renderInlineFormatted(content)}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        }
+
+        return <p key={bIdx}>{renderInlineFormatted(trimmed)}</p>;
+      })}
+    </div>
+  );
+}
+
+function renderInlineFormatted(text: string) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((part, idx) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      const inner = part.slice(2, -2);
+      return (
+        <strong
+          key={idx}
+          className="font-semibold text-[#dfb46c] bg-[#dfb46c]/10 px-1 py-0.5 rounded font-mono text-[11px]"
+        >
+          {inner}
+        </strong>
+      );
+    }
+    return part;
+  });
 }

@@ -16,11 +16,14 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 
+import { getUserFacingResult } from "@/lib/chess/results";
+
 interface GameRecord {
   id: string;
   white: string;
   black: string;
   result: string;
+  userColor?: string | null;
   playedAt: Date | string | null;
   createdAt: Date | string;
   totalMoves: number;
@@ -65,15 +68,16 @@ export function DashboardClient({ user, stats, recentGames }: DashboardClientPro
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
-  const getResultBadge = (result: string) => {
-    if (result === "1-0") {
+  const getResultBadge = (result: string, userColor?: string | null) => {
+    const userResult = getUserFacingResult(result, userColor);
+    if (userResult === "WIN") {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/60 text-emerald-400 border border-emerald-800/50">
           Win
         </span>
       );
     }
-    if (result === "0-1") {
+    if (userResult === "LOSS") {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-950/60 text-red-400 border border-red-800/50">
           Loss
@@ -210,7 +214,7 @@ export function DashboardClient({ user, stats, recentGames }: DashboardClientPro
 
       {/* Stockfish Insights Sub-Bar (Visible when analyses exist) */}
       {gamesAnalyzed > 0 && (
-        <div className="glass-card rounded-2xl p-5 border border-[rgba(223,180,108,0.22)] bg-gradient-to-r from-zinc-950/80 via-[#161622]/60 to-zinc-950/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="glass-card rounded-2xl p-4 sm:p-5 border border-[rgba(223,180,108,0.22)] bg-gradient-to-r from-zinc-950/80 via-[#161622]/60 to-zinc-950/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-[#dfb46c]/15 text-[#dfb46c] flex items-center justify-center shrink-0">
               <AlertTriangle className="w-4 h-4" />
@@ -221,14 +225,14 @@ export function DashboardClient({ user, stats, recentGames }: DashboardClientPro
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-mono">
-            <span className="px-3 py-1 rounded-xl bg-amber-950/40 text-amber-400 border border-amber-800/40">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap text-xs font-mono">
+            <span className="px-2.5 sm:px-3 py-1 rounded-xl bg-amber-950/40 text-amber-400 border border-amber-800/40">
               {stats.totalInaccuracies || 0} Inaccuracies
             </span>
-            <span className="px-3 py-1 rounded-xl bg-orange-950/40 text-orange-400 border border-orange-800/40">
+            <span className="px-2.5 sm:px-3 py-1 rounded-xl bg-orange-950/40 text-orange-400 border border-orange-800/40">
               {stats.totalMistakes || 0} Mistakes
             </span>
-            <span className="px-3 py-1 rounded-xl bg-red-950/40 text-red-400 border border-red-800/40">
+            <span className="px-2.5 sm:px-3 py-1 rounded-xl bg-red-950/40 text-red-400 border border-red-800/40">
               {stats.totalBlunders || 0} Blunders
             </span>
           </div>
@@ -270,9 +274,9 @@ export function DashboardClient({ user, stats, recentGames }: DashboardClientPro
             {recentGames.map((game) => (
               <div
                 key={game.id}
-                className="glass-card glass-card-hover rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-4 border border-[rgba(223,180,108,0.18)]"
+                className="glass-card glass-card-hover rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border border-[rgba(223,180,108,0.18)]"
               >
-                <div className="flex items-center gap-4 min-w-0">
+                <div className="flex items-center gap-3.5 min-w-0">
                   <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-[#dfb46c]/30 flex items-center justify-center shrink-0">
                     <ChessKingIcon className="w-5 h-5 text-[#dfb46c]" />
                   </div>
@@ -286,31 +290,35 @@ export function DashboardClient({ user, stats, recentGames }: DashboardClientPro
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 shrink-0">
-                  {getAnalysisBadge(game.analysis)}
-                  {getResultBadge(game.result)}
+                <div className="flex items-center justify-between sm:justify-end gap-2.5 sm:gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-800/60">
+                  <div className="flex items-center gap-2">
+                    {getAnalysisBadge(game.analysis)}
+                    {getResultBadge(game.result, game.userColor)}
+                  </div>
 
-                  {/* Delete Option */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setDeleteModalGame({
-                        id: game.id,
-                        title: `${game.white} vs ${game.black}`,
-                      });
-                    }}
-                    title="Delete game"
-                    className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-950/20 rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    {/* Delete Option */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteModalGame({
+                          id: game.id,
+                          title: `${game.white} vs ${game.black}`,
+                        });
+                      }}
+                      title="Delete game"
+                      className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-950/20 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
 
-                  <Link
-                    href={`/games/${game.id}`}
-                    className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
+                    <Link
+                      href={`/games/${game.id}`}
+                      className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

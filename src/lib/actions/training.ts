@@ -9,7 +9,6 @@ import type {
   TrainingPuzzle,
   AttemptResult,
   TrainingCategory,
-  PuzzleContinuationStep,
 } from "@/lib/chess/training-types";
 import {
   evaluateTrainingAttempt,

@@ -147,7 +147,7 @@ export function HeroSection() {
               </div>
 
               {/* Floating "★ BRILLIANT MOVE" Card */}
-              <div className="absolute -top-6 -right-4 sm:-right-8 z-30 max-w-[220px] glass-card rounded-xl p-4 shadow-2xl border border-emerald-500/40 bg-[#13131c]/95 animate-float">
+              <div className="absolute -top-6 right-0 sm:-right-8 z-30 max-w-[200px] sm:max-w-[220px] glass-card rounded-xl p-3 sm:p-4 shadow-2xl border border-emerald-500/40 bg-[#13131c]/95 animate-float">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400 mb-1">
                   <Star className="w-3.5 h-3.5 fill-emerald-400" />
                   <span>BRILLIANT MOVE</span>
@@ -164,7 +164,7 @@ export function HeroSection() {
               </div>
 
               {/* Floating "+ ACCURACY" Radial Gauge Card */}
-              <div className="absolute -bottom-6 -left-4 sm:-left-8 z-30 glass-card rounded-xl p-4 shadow-2xl border border-[rgba(223,180,108,0.4)] bg-[#13131c]/95 animate-float-reverse flex items-center gap-4">
+              <div className="absolute -bottom-6 left-0 sm:-left-8 z-30 glass-card rounded-xl p-3 sm:p-4 shadow-2xl border border-[rgba(223,180,108,0.4)] bg-[#13131c]/95 animate-float-reverse flex items-center gap-3 sm:gap-4">
                 <div className="relative w-14 h-14 flex items-center justify-center">
                   <svg className="w-14 h-14 -rotate-90" viewBox="0 0 36 36">
                     <path

@@ -326,22 +326,22 @@ export function ProfileClient({ initialData }: ProfileClientProps) {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
                 <p className="text-[10px] text-zinc-500 uppercase font-mono">Accuracy</p>
-                <p className="font-serif text-lg font-bold text-white mt-0.5">
+                <p className="font-serif text-base sm:text-lg font-bold text-white mt-0.5">
                   {data.whiteStats.accuracy > 0 ? `${data.whiteStats.accuracy}%` : "—"}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
                 <p className="text-[10px] text-zinc-500 uppercase font-mono">ACPL</p>
-                <p className="font-serif text-lg font-bold text-white mt-0.5">
+                <p className="font-serif text-base sm:text-lg font-bold text-white mt-0.5">
                   {data.whiteStats.acpl > 0 ? data.whiteStats.acpl : "—"}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
-                <p className="text-[10px] text-zinc-500 uppercase font-mono">Record (W-L-D)</p>
-                <p className="font-mono text-sm font-bold text-white mt-1">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
+                <p className="text-[10px] text-zinc-500 uppercase font-mono">Record</p>
+                <p className="font-mono text-xs sm:text-sm font-bold text-white mt-1">
                   {data.whiteStats.wins}-{data.whiteStats.losses}-{data.whiteStats.draws}
                 </p>
               </div>
@@ -383,22 +383,22 @@ export function ProfileClient({ initialData }: ProfileClientProps) {
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
+            <div className="grid grid-cols-3 gap-2 sm:gap-3 text-center">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
                 <p className="text-[10px] text-zinc-500 uppercase font-mono">Accuracy</p>
-                <p className="font-serif text-lg font-bold text-white mt-0.5">
+                <p className="font-serif text-base sm:text-lg font-bold text-white mt-0.5">
                   {data.blackStats.accuracy > 0 ? `${data.blackStats.accuracy}%` : "—"}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
                 <p className="text-[10px] text-zinc-500 uppercase font-mono">ACPL</p>
-                <p className="font-serif text-lg font-bold text-white mt-0.5">
+                <p className="font-serif text-base sm:text-lg font-bold text-white mt-0.5">
                   {data.blackStats.acpl > 0 ? data.blackStats.acpl : "—"}
                 </p>
               </div>
-              <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
-                <p className="text-[10px] text-zinc-500 uppercase font-mono">Record (W-L-D)</p>
-                <p className="font-mono text-sm font-bold text-white mt-1">
+              <div className="p-2.5 sm:p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80">
+                <p className="text-[10px] text-zinc-500 uppercase font-mono">Record</p>
+                <p className="font-mono text-xs sm:text-sm font-bold text-white mt-1">
                   {data.blackStats.wins}-{data.blackStats.losses}-{data.blackStats.draws}
                 </p>
               </div>

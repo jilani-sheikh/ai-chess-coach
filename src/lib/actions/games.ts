@@ -124,9 +124,17 @@ export async function getUserGamesAction(params?: {
 
   if (resultFilter && resultFilter !== "all") {
     if (resultFilter === "win") {
-      where.result = "1-0";
+      where.OR = [
+        { userColor: "BLACK", result: "0-1" },
+        { userColor: { not: "BLACK" }, result: "1-0" },
+        { userColor: null, result: "1-0" },
+      ];
     } else if (resultFilter === "loss") {
-      where.result = "0-1";
+      where.OR = [
+        { userColor: "BLACK", result: "1-0" },
+        { userColor: { not: "BLACK" }, result: "0-1" },
+        { userColor: null, result: "0-1" },
+      ];
     } else if (resultFilter === "draw") {
       where.result = "1/2-1/2";
     }
@@ -184,8 +192,26 @@ export async function getDashboardDataAction() {
     analysisAggregates,
   ] = await Promise.all([
     db.game.count({ where: { userId } }),
-    db.game.count({ where: { userId, result: "1-0" } }),
-    db.game.count({ where: { userId, result: "0-1" } }),
+    db.game.count({
+      where: {
+        userId,
+        OR: [
+          { userColor: "BLACK", result: "0-1" },
+          { userColor: { not: "BLACK" }, result: "1-0" },
+          { userColor: null, result: "1-0" },
+        ],
+      },
+    }),
+    db.game.count({
+      where: {
+        userId,
+        OR: [
+          { userColor: "BLACK", result: "1-0" },
+          { userColor: { not: "BLACK" }, result: "0-1" },
+          { userColor: null, result: "0-1" },
+        ],
+      },
+    }),
     db.game.count({ where: { userId, result: "1/2-1/2" } }),
     db.game.aggregate({
       where: { userId },

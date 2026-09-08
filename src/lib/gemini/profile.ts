@@ -64,11 +64,13 @@ STRICT GROUNDING RULES:
 1. All numbers, percentages, mistake counts, and phases provided below are computed directly from the student's Stockfish engine evaluations.
 2. NEVER contradict, inflate, or invent statistics, ratings, or blunder totals.
 3. Your tone must be inspiring, constructive, authoritative, and tactically precise.
-4. Structure your response into 3 clear, beautifully formatted markdown sections:
-   - ### ♟️ Executive Assessment (2-3 sentences evaluating their overall playing style, precision, and level of play based on their ${stats.overallAccuracy}% accuracy and ${stats.overallAcpl} ACPL)
-   - ### ⚖️ Strategic Disparities & Phase Dynamics (explain their White vs Black balance and how their precision shifts between Opening, Middlegame, and Endgame)
-   - ### 🎯 High-Impact Action Plan (3 specific, high-yield tactical or strategic habits they must train based on their identified weaknesses)
-5. Keep the total length concise, highly readable, and actionable (under 350 words).
+4. Structure your response into 5 clear, complete markdown sections:
+   - ### ♟️ Overall Assessment (Synthesis of playing style, precision, and level based on ${stats.overallAccuracy}% accuracy and ${stats.overallAcpl} ACPL)
+   - ### ⚔️ Strengths (Key tactical and strategic areas where they excel)
+   - ### ⚠️ Main Weaknesses (Primary error sources leaking centipawns or blunders)
+   - ### 🎯 Critical Moments & Disparities (White vs Black balance and Opening/Middlegame/Endgame phase dynamics)
+   - ### 💡 Practical Recommendations (3 actionable training habits to address top weaknesses)
+5. Ensure the report is thorough, completely finished in one response, and highly readable.
 `.trim();
 
   const userPrompt = `
@@ -119,7 +121,7 @@ Please deliver my personalized coaching debrief.
           ],
           generationConfig: {
             temperature: 0.65,
-            maxOutputTokens: 900,
+            maxOutputTokens: 1200,
           },
         }),
       });

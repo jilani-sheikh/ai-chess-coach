@@ -11,6 +11,7 @@ import { EvaluationGraph } from "@/components/games/EvaluationGraph";
 import { MoveAnalysisCard } from "@/components/games/MoveAnalysisCard";
 import { AnalysisOverviewCard } from "@/components/games/AnalysisOverviewCard";
 import { AICoachChat } from "@/components/games/AICoachChat";
+import { getUserFacingResult } from "@/lib/chess/results";
 import {
   ArrowLeft,
   Download,
@@ -180,24 +181,25 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
     });
   };
 
-  const getResultBadge = (result: string) => {
-    if (result === "1-0") {
+  const getResultBadge = (result: string, userColor?: string | null) => {
+    const userResult = getUserFacingResult(result, userColor);
+    if (userResult === "WIN") {
       return (
         <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-emerald-950/70 text-emerald-400 border border-emerald-800/60 shadow-sm">
-          1 - 0 Win
+          {result} Win
         </span>
       );
     }
-    if (result === "0-1") {
+    if (userResult === "LOSS") {
       return (
         <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-red-950/70 text-red-400 border border-red-800/60 shadow-sm">
-          0 - 1 Loss
+          {result} Loss
         </span>
       );
     }
     return (
       <span className="px-4 py-1.5 rounded-full text-xs font-bold bg-amber-950/70 text-amber-400 border border-amber-800/60 shadow-sm">
-        ½ - ½ Draw
+        {result} Draw
       </span>
     );
   };
@@ -278,7 +280,7 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
 
         {/* Top Actions & Result Badge */}
         <div className="flex items-center gap-3 flex-wrap">
-          {getResultBadge(game.result)}
+          {getResultBadge(game.result, game.userColor)}
 
           <button
             onClick={handleShare}
@@ -310,12 +312,12 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Interactive Chessboard, Eval Bar & Playback Controls */}
         <div className="order-1 lg:col-span-7 space-y-5">
-          <div className="glass-card rounded-3xl p-4 sm:p-5 border border-[rgba(223,180,108,0.22)] shadow-2xl space-y-4">
+          <div className="glass-card rounded-3xl p-3.5 sm:p-5 border border-[rgba(223,180,108,0.22)] shadow-2xl space-y-4">
             {/* Board Container with Side-by-Side Eval Bar */}
-            <div className="flex items-center justify-center gap-3 sm:gap-4 max-w-[480px] mx-auto">
+            <div className="flex items-center justify-center gap-2 sm:gap-4 max-w-[480px] mx-auto">
               {/* Vertical Evaluation Bar (visible when analysis completed or active) */}
               {game.analysis?.status === "COMPLETED" && (
-                <div className="h-[280px] sm:h-[420px]">
+                <div className="h-[240px] xs:h-[280px] sm:h-[420px] shrink-0">
                   <EvaluationBar
                     score={activeScore}
                     mate={activeMate}
@@ -325,7 +327,7 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
               )}
 
               {/* Chessboard */}
-              <div className="flex-1 aspect-square rounded-2xl overflow-hidden border border-[rgba(223,180,108,0.3)] shadow-xl">
+              <div className="flex-1 aspect-square rounded-2xl overflow-hidden border border-[rgba(223,180,108,0.3)] shadow-xl min-w-0">
                 <Chessboard
                   options={{
                     position: currentFen,
@@ -341,15 +343,15 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
             {/* Playback & Controls Bar */}
             <div className="space-y-3 pt-2 border-t border-zinc-800/80">
               {/* Button Bar */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
                   <button
                     onClick={() => {
                       setIsPlaying(false);
                       setCurrentMoveIndex(-1);
                     }}
                     title="First Move"
-                    className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors"
+                    className="p-2 sm:p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors"
                   >
                     <SkipBack className="w-4 h-4" />
                   </button>
@@ -359,7 +361,7 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
                       setCurrentMoveIndex((prev) => Math.max(-1, prev - 1));
                     }}
                     title="Previous Move"
-                    className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors"
+                    className="p-2 sm:p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
@@ -367,7 +369,7 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
                   <button
                     onClick={() => setIsPlaying(!isPlaying)}
                     title={isPlaying ? "Pause Playback" : "Autoplay Moves"}
-                    className="px-4 py-2.5 rounded-xl bg-gold-gradient text-[#0b0b0e] font-bold text-xs flex items-center gap-1.5 shadow-md hover:opacity-90 transition-opacity"
+                    className="px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-gold-gradient text-[#0b0b0e] font-bold text-xs flex items-center gap-1.5 shadow-md hover:opacity-90 transition-opacity"
                   >
                     {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
                     {isPlaying ? "Pause" : "Play"}
@@ -379,7 +381,7 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
                       setCurrentMoveIndex((prev) => Math.min(moves.length - 1, prev + 1));
                     }}
                     title="Next Move"
-                    className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors"
+                    className="p-2 sm:p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -389,7 +391,7 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
                       setCurrentMoveIndex(moves.length - 1);
                     }}
                     title="Last Move"
-                    className="p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors"
+                    className="p-2 sm:p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors"
                   >
                     <SkipForward className="w-4 h-4" />
                   </button>
@@ -400,10 +402,10 @@ export function GameDetailsClient({ game, parsed }: GameDetailsClientProps) {
                       setUserOrientation(boardOrientation === "white" ? "black" : "white")
                     }
                     title="Flip Board Orientation"
-                    className="px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors flex items-center gap-1.5 text-xs font-medium"
+                    className="px-2.5 sm:px-3 py-2 sm:py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-[#dfb46c] hover:border-[#dfb46c]/40 transition-colors flex items-center gap-1.5 text-xs font-medium"
                   >
                     <RotateCcw className="w-3.5 h-3.5 text-[#dfb46c]" />
-                    <span>Flip Board</span>
+                    <span className="hidden xs:inline">Flip Board</span>
                   </button>
                 </div>
 

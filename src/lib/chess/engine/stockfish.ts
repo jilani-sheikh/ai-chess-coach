@@ -144,7 +144,7 @@ export class StockfishSession {
 
           if (line.startsWith("info") && line.includes("score")) {
             evalLine = line;
-            const pvMatch = line.match(/pv (.+)$/);
+            const pvMatch = line.match(/\s+pv\s+(.+)$/);
             if (pvMatch) {
               pv = pvMatch[1];
             }

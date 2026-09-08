@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useCallback, useEffect, useRef } from "react";
+import { useState, useTransition, useCallback, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import {
   Swords,
@@ -20,6 +20,7 @@ import {
   Zap,
   Clock,
   Bot,
+  Eye,
 } from "lucide-react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
@@ -75,11 +76,6 @@ const RESULT_TEXT: Record<AttemptResult, string> = {
   CORRECT: "text-emerald-400",
   ACCEPTABLE: "text-cyan-400",
   INCORRECT: "text-red-400",
-};
-const RESULT_LABEL: Record<AttemptResult, string> = {
-  CORRECT: "✓ Best Move!",
-  ACCEPTABLE: "≈ Acceptable",
-  INCORRECT: "✗ Not Best",
 };
 const RESULT_FULL_LABEL: Record<AttemptResult, string> = {
   CORRECT: "Best Move Found!",
@@ -159,7 +155,10 @@ export function TrainingClient({ initialData }: TrainingClientProps) {
   // ── Derived ────────────────────────────────────────────────────────────────
 
   const currentPuzzle = puzzles[puzzleIndex] ?? null;
-  const continuationSteps: PuzzleContinuationStep[] = currentPuzzle?.continuationSteps ?? [];
+  const continuationSteps: PuzzleContinuationStep[] = useMemo(
+    () => currentPuzzle?.continuationSteps ?? [],
+    [currentPuzzle]
+  );
   const currentStep: PuzzleContinuationStep | null = continuationSteps[puzzleStep] ?? null;
   const totalSteps = continuationSteps.length;
   const boardOrientation: "white" | "black" =
@@ -382,7 +381,6 @@ export function TrainingClient({ initialData }: TrainingClientProps) {
     // Build a human-readable step summary for Gemini context
     const stepSummary = stepResults
       .map((sr) => {
-        const step = continuationSteps[sr.stepIndex];
         const oppPart = sr.opponentResponseSan
           ? `, Stockfish responded with ${sr.opponentResponseSan}`
           : "";
@@ -714,6 +712,8 @@ function StepResultPanel({
   onSkip: () => void;
   isSkipping: boolean;
 }) {
+  const [showAnswer, setShowAnswer] = useState(false);
+
   return (
     <div className="space-y-4">
       <div
@@ -725,7 +725,7 @@ function StepResultPanel({
             <h3 className="font-serif text-base font-bold text-white">
               Step {puzzleStep + 1} of {totalSteps} — Not the Best Move
             </h3>
-            <p className="text-[11px] text-zinc-400">Try to find a better continuation.</p>
+            <p className="text-[11px] text-zinc-400">Think carefully and try another move.</p>
           </div>
         </div>
 
@@ -734,32 +734,50 @@ function StepResultPanel({
             <p className="text-[10px] uppercase tracking-wider text-zinc-400">You played</p>
             <p className="font-mono font-bold text-white text-base">{stepResult.userMoveSan}</p>
           </div>
-          <div className="p-3 rounded-xl bg-black/20 border border-white/10 space-y-1 text-center">
+          <div className="p-3 rounded-xl bg-black/20 border border-white/10 space-y-1 text-center flex flex-col items-center justify-center">
             <p className="text-[10px] uppercase tracking-wider text-zinc-400">Engine best</p>
-            <p className="font-mono font-bold text-emerald-400 text-base">{stepResult.bestMoveSan}</p>
+            {showAnswer ? (
+              <p className="font-mono font-bold text-emerald-400 text-base">{stepResult.bestMoveSan}</p>
+            ) : (
+              <button
+                onClick={() => setShowAnswer(true)}
+                className="text-[11px] font-bold text-[#dfb46c] hover:underline cursor-pointer flex items-center gap-1 mt-0.5"
+              >
+                <Eye className="w-3.5 h-3.5" /> Show Answer
+              </button>
+            )}
           </div>
         </div>
 
         <p className="text-xs text-zinc-400">
           Your move cost <span className="text-white font-bold">{stepResult.cplAfter} centipawns</span> vs the engine best.
           {stepResult.cplAfter <= 40
-            ? " That's close — try another move to find the strongest one."
+            ? " That's close — try another move to find the strongest line."
             : " Look for a move that seizes the initiative or creates a concrete threat."}
         </p>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap sm:flex-nowrap items-center gap-2">
         <button
           onClick={onRetry}
-          className="flex-1 px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-[#dfb46c]/40 text-zinc-200 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer"
+          className="flex-1 min-w-[120px] px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-[#dfb46c]/40 text-zinc-200 hover:text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
         >
           <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-          <span>Retry This Step</span>
+          <span>Retry Step</span>
         </button>
+        {!showAnswer && (
+          <button
+            onClick={() => setShowAnswer(true)}
+            className="flex-1 min-w-[120px] px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-[#dfb46c]/40 text-[#dfb46c] font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+          >
+            <Eye className="w-3.5 h-3.5" />
+            <span>Show Answer</span>
+          </button>
+        )}
         <button
           onClick={onSkip}
           disabled={isSkipping}
-          className="flex-1 px-4 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-red-900/40 text-zinc-400 hover:text-zinc-200 font-semibold text-xs flex items-center justify-center gap-2 transition-colors disabled:opacity-50 cursor-pointer"
+          className="flex-1 min-w-[120px] px-3 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-red-900/40 text-zinc-400 hover:text-zinc-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 cursor-pointer"
         >
           {isSkipping ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -901,7 +919,7 @@ function PuzzleDonePanel({
           </div>
         ) : (
           <p className="text-xs text-zinc-500 italic">
-            Click "Explain with AI" for a Grandmaster coaching breakdown of this full continuation.
+            Click &quot;Explain with AI&quot; for a Grandmaster coaching breakdown of this full continuation.
           </p>
         )}
       </div>

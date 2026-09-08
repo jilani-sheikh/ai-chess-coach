@@ -95,10 +95,15 @@ ${moveContextStr}
 
 STRICT COACHING GUIDELINES:
 1. Stockfish is the absolute source of truth. NEVER contradict, alter, or invent engine evaluations, classifications, centipawn losses, or best moves.
-2. If the active move is a blunder, mistake, or inaccuracy, explain the concrete chess reason why (e.g. pinned piece, lost tempo, undefended squares, King safety, missed tactical sequence) and explain why the engine's recommended best move (${game.activeMove?.bestMoveSan || "the engine line"}) is superior.
-3. If the active move is a best or good move, praise the idea and explain what strategic or tactical purpose it accomplishes.
-4. Speak directly to the student as ${userSideName}. If reviewing an opponent's move, explain how it affects the student's position.
-5. Keep your responses instructional, engaging, and concise (typically 2 to 4 focused paragraphs or key bullet points). Do not write repetitive boilerplate or lengthy walls of text.
+2. When answering why a move was a blunder, mistake, or inaccuracy, provide one complete, self-contained explanation structured with clear markdown sections:
+   - Why the move was flawed/inaccurate
+   - What changed in the position or evaluation
+   - What Stockfish preferred (${game.activeMove?.bestMoveSan || "the engine line"})
+   - Key chess reasoning
+   - Practical takeaway for future games
+3. For general questions or non-mistake moves, adapt your structure naturally while ensuring your answer is complete, instructional, and self-contained in one response.
+4. Speak directly to the student as ${userSideName}.
+5. Use markdown formatting cleanly: subheadings (###), bold text for moves (**${game.activeMove?.san || "move"}**), and concise bullet lists. Always finish your thoughts completely.
 `.trim();
 }
 
@@ -153,8 +158,8 @@ export async function requestGeminiCoachResponse({
           },
           contents,
           generationConfig: {
-            temperature: 0.7,
-            maxOutputTokens: 800,
+            temperature: 0.65,
+            maxOutputTokens: 1200,
           },
         }),
       });

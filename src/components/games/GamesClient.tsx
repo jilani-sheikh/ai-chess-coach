@@ -9,11 +9,14 @@ import { DeleteGameModal } from "@/components/games/DeleteGameModal";
 import { Search, Plus, ChevronRight, ChevronLeft, Trash2, LayoutList, LayoutGrid, Swords, Calendar } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { getUserFacingResult } from "@/lib/chess/results";
+
 interface GameRecord {
   id: string;
   white: string;
   black: string;
   result: string;
+  userColor?: string | null;
   event: string | null;
   playedAt: Date | string | null;
   createdAt: Date | string;
@@ -90,15 +93,16 @@ export function GamesClient({
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
-  const getResultBadge = (result: string) => {
-    if (result === "1-0") {
+  const getResultBadge = (result: string, userColor?: string | null) => {
+    const userResult = getUserFacingResult(result, userColor);
+    if (userResult === "WIN") {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-950/60 text-emerald-400 border border-emerald-800/50">
           Win
         </span>
       );
     }
-    if (result === "0-1") {
+    if (userResult === "LOSS") {
       return (
         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-950/60 text-red-400 border border-red-800/50">
           Loss
@@ -240,10 +244,10 @@ export function GamesClient({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.2, delay: index * 0.04 }}
-                className="glass-card glass-card-hover rounded-2xl p-4 sm:p-5 flex items-center justify-between gap-5 border border-[rgba(223,180,108,0.18)]"
+                className="glass-card glass-card-hover rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-5 border border-[rgba(223,180,108,0.18)]"
               >
                 {/* Board Thumbnail & Game Info */}
-                <div className="flex items-center gap-4 min-w-0">
+                <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
                   <MiniBoardPreview pgn={game.pgn} />
 
                   <div className="min-w-0 space-y-1.5">
@@ -259,7 +263,7 @@ export function GamesClient({
                       {game.event && (
                         <>
                           <span>•</span>
-                          <span className="truncate max-w-[150px]">{game.event}</span>
+                          <span className="truncate max-w-[120px] sm:max-w-[150px]">{game.event}</span>
                         </>
                       )}
                     </p>
@@ -276,13 +280,15 @@ export function GamesClient({
                 </div>
 
                 {/* Right side actions & result badge */}
-                <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3 shrink-0">
-                  {game.analysis?.status === "COMPLETED" && (
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-[#dfb46c]/15 text-[#f4d084] border border-[#dfb46c]/30 shadow-sm">
-                      {game.analysis.accuracy !== null ? `${game.analysis.accuracy.toFixed(1)}%` : "Done"}
-                    </span>
-                  )}
-                  {getResultBadge(game.result)}
+                <div className="flex items-center justify-between sm:justify-end gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-800/60">
+                  <div className="flex items-center gap-2">
+                    {game.analysis?.status === "COMPLETED" && (
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-bold bg-[#dfb46c]/15 text-[#f4d084] border border-[#dfb46c]/30 shadow-sm">
+                        {game.analysis.accuracy !== null ? `${game.analysis.accuracy.toFixed(1)}%` : "Done"}
+                      </span>
+                    )}
+                    {getResultBadge(game.result, game.userColor)}
+                  </div>
 
                   <div className="flex items-center gap-2">
                     <button

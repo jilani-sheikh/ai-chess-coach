@@ -30,7 +30,7 @@ export function AppNavbar({ user }: AppNavbarProps) {
   const isDashboardActive = pathname === "/dashboard";
   const isGamesActive = pathname?.startsWith("/games");
   const isProfileActive = pathname === "/profile";
-  const isTrainingActive = pathname === "/training";
+  const isTrainingActive = pathname?.startsWith("/training");
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-[#0b0b0e]/90 border-b border-[rgba(223,180,108,0.18)] shadow-md">
