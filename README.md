@@ -18,7 +18,7 @@
 
 ## 🚀 Live Demo
 
-* 🔗 **Live Application:** [Add your deployed Vercel URL here]
+* 🔗 **Live Application:** [AI Chess Coach](https://ai-chess-coach-plum.vercel.app)
 * 🔗 **GitHub Repository:** [AI Chess Coach](https://github.com/jilani-sheikh/ai-chess-coach)
 
 > Explore the app by signing in, uploading your Chess.com or Lichess PGN files, analyzing games move-by-move, and starting personalized training drills.
