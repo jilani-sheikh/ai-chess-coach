@@ -121,7 +121,7 @@ export async function getProfileDataAction(): Promise<ProfileData> {
 
   // Filter games that have a valid userColor (WHITE or BLACK)
   const validGames = gamesWithAnalysis.filter(
-    (g) =>
+    (g: (typeof gamesWithAnalysis)[number]) =>
       g.userColor &&
       (g.userColor.toUpperCase() === "WHITE" || g.userColor.toUpperCase() === "BLACK")
   );

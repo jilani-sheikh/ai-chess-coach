@@ -143,13 +143,13 @@ export async function getTrainingDashboardDataAction(): Promise<TrainingDashboar
 
   const puzzlesAttempted = recentAttempts.length;
   const puzzlesSolved = recentAttempts.filter(
-    (a) => a.result === "CORRECT" || a.result === "ACCEPTABLE"
+    (a: (typeof recentAttempts)[number]) => a.result === "CORRECT" || a.result === "ACCEPTABLE"
   ).length;
   const trainingAccuracy =
     puzzlesAttempted > 0 ? Math.round((puzzlesSolved / puzzlesAttempted) * 100) : 0;
 
   const availablePuzzleCount = gameStats.reduce(
-    (total, g) => total + (g.analysis?.moves.length ?? 0),
+    (total: number, g: (typeof gameStats)[number]) => total + (g.analysis?.moves.length ?? 0),
     0
   );
 
@@ -553,7 +553,9 @@ export async function completeTrainingSessionAction(
     data: { status: "COMPLETED" },
   });
 
-  const categoriesPracticed = [...new Set(session.attempts.map((a) => a.category))];
+  const categoriesPracticed: string[] = Array.from(
+    new Set(session.attempts.map((a: (typeof session.attempts)[number]) => a.category))
+  );
   const total = session.completedPuzzles;
   const score = session.solvedCount;
   const accuracy = total > 0 ? Math.round((score / total) * 100) : 0;

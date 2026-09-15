@@ -5,6 +5,7 @@ import { authOptions } from "@/lib/auth/auth";
 import { db } from "@/lib/db";
 import { analyzeGamePgn } from "@/lib/chess/engine";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 export interface AnalysisActionResult {
   success: boolean;
@@ -69,7 +70,7 @@ export async function analyzeGameAction(
   try {
     const summary = await analyzeGamePgn(game.pgn, { depth });
 
-    await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx: Prisma.TransactionClient) => {
       // Clear old moves if re-analyzing
       await tx.moveAnalysis.deleteMany({
         where: { analysisId },
